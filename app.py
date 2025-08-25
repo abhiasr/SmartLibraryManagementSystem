@@ -1,3 +1,16 @@
+import os
+import sqlite3
+
+DB_PATH = 'library.db'
+SCHEMA_PATH = 'full_schema.sql'
+
+def init_db():
+    if not os.path.exists(DB_PATH):
+        with sqlite3.connect(DB_PATH) as conn:
+            with open(SCHEMA_PATH, 'r') as f:
+                conn.executescript(f.read())
+
+init_db()
 # --- Helper for user-friendly action descriptions ---
 def get_action_description(log):
     action = log['action']
