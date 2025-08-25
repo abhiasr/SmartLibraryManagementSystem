@@ -939,6 +939,9 @@ def get_pending_reservation_count():
     row = db.execute("SELECT COUNT(*) as cnt FROM reservations WHERE status = 'active'").fetchone()
     return row['cnt'] if row else 0
 
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
 
