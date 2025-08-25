@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard - Library System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot.css') }}">
+    <script src="{{ url_for('static', filename='search_books.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='wishlist.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='autocomplete.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='show_more_books.js') }}" defer></script>
+    <style>
+    .autocomplete-dropdown {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        width: 90%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .autocomplete-item {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .autocomplete-item:hover {
+        background: #f0f0f0;
+    }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="welcome-section">
+            <h1>Welcome back, {{ user_data['first_name'] | e }} {{ user_data['last_name'] | e }}! 👋</h1>
+            <p>Explore our library</p>
+        </div>
+        <div class="header-actions">
+            <div style="position:relative;display:inline-block;">
+                <button id="notifBell" style="background:none;border:none;cursor:pointer;font-size:1.6em;position:relative;">
+                    🔔<span id="notifCount" style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 6px;font-size:0.8em;display:none;">0</span>
+                </button>
+                <div id="notifDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ccc;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:320px;max-height:350px;overflow-y:auto;z-index:1001;">
+                    <div id="notifList" style="padding:10px;"></div>
+                </div>
+            </div>
+            <a href="{{ url_for('profile') }}" class="logout-btn" style="background:#4a72f5; margin-right:12px;">👤 Profile</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+    <script>
+    function fetchNotifications() {
+        fetch('/notifications').then(r=>r.json()).then(data=>{
+            let count = data.unread_count;
+            let notifCount = document.getElementById('notifCount');
+            notifCount.textContent = count;
+            notifCount.style.display = count > 0 ? 'inline-block' : 'none';
+            let notifList = document.getElementById('notifList');
+            notifList.innerHTML = '';
+            if(data.notifications.length === 0) {
+                notifList.innerHTML = '<div style="padding:10px;color:#888;">No notifications</div>';
+            } else {
+                data.notifications.forEach(n=>{
+                    notifList.innerHTML += `<div style='padding:8px 0;border-bottom:1px solid #eee;${n.is_read ? '' : 'font-weight:bold;'}'>${n.message}<br><span style='font-size:0.8em;color:#888;'>${n.created_at ? n.created_at.split('T')[0] : ''}</span></div>`;
+                });
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded',()=>{
+        fetchNotifications();
+        document.getElementById('notifBell').onclick = function(e) {
+            let dd = document.getElementById('notifDropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+            fetchNotifications();
+        };
+        document.addEventListener('click', function(e) {
+            if(!e.target.closest('#notifBell') && !e.target.closest('#notifDropdown')) {
+                document.getElementById('notifDropdown').style.display = 'none';
+            }
+        });
+    });
+    </script>
+
+    <div class="main-content">
+        {% if message %}
+        <div class="success-message">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <div class="stats-cards">
+            <div class="stat-card issued">
+                <h3>{{ total_issued_count }}</h3>
+                <p>📚 Total Books Borrowed</p>
+            </div>
+            <div class="stat-card current">
+                <h3>{{ currently_issued_count }}</h3>
+                <p>📖 Currently Reading</p>
+            </div>
+            <div class="stat-card overdue">
+                <h3>{{ overdue_count }}</h3>
+                <p>⏰ Overdue Books</p>
+            </div>
+            <div class="stat-card fines">
+                <h3>₹{{ '%.2f' | format(pending_fines_amount) }}</h3>
+                <p>💰 Pending Fines</p>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <h2>🔍 Search Books</h2>
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search for books by title, author, or category..." value="{{ search_query | e }}">
+                <select name="filter">
+                    <option value="all" {% if search_filter == 'all' %}selected{% endif %}>All Fields</option>
+                    <option value="title" {% if search_filter == 'title' %}selected{% endif %}>Title</option>
+                    <option value="author" {% if search_filter == 'author' %}selected{% endif %}>Author</option>
+                    <option value="category" {% if search_filter == 'category' %}selected{% endif %}>Category</option>
+                </select>
+                <button type="submit" class="search-btn">Search</button>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>📚 {% if search_query %}Search Results for "{{ search_query | e }}"{% else %}Available Books{% endif %}</h2>
+            {% if books %}
+                <div class="books-grid" id="booksGrid">
+                    {% for book in books %}
+                        {% set available_copies = book['total_stock'] - book['issued_count'] %}
+                        {% set availability_class = 'available' if available_copies > 2 else ('limited' if available_copies > 0 else 'unavailable') %}
+                        {% set availability_text = 'Available (' ~ available_copies ~ ' copies)' if available_copies > 0 else 'Not Available' %}
+                        <div class="book-card">
+                            <div class="book-title">{{ book['title'] | e }}</div>
+                            <div class="book-author">by {{ book['author_name'] | e }}</div>
+                            <div class="book-category">{{ book['category'] | e }}</div>
+                            <div class="book-details">
+                                {% if book['year'] %}
+                                    Published: {{ book['year'] | e }}<br>
+                                {% endif %}
+                            </div>
+                            <div class="book-availability">
+                                <span class="{{ availability_class }}">{{ availability_text }}</span>
+                            </div>
+                            <div class="book-actions">
+                                <button class="btn {% if book['in_wishlist'] %}btn-danger{% else %}btn-primary{% endif %} wishlist-btn" data-book-id="{{ book['book_id'] }}">
+                                    {% if book['in_wishlist'] %}💔 Remove from Wishlist{% else %}❤️ Add to Wishlist{% endif %}
+                                </button>
+                                {# Debug: show has_reserved value #}
+                                {# <span style="color: red; font-size: 10px;">has_reserved: {{ book['has_reserved'] }}</span> #}
+                                {% if available_copies == 0 and not book['has_reserved'] %}
+                                <form method="POST" action="{{ url_for('reserve_book') }}" style="display:inline;">
+                                    <input type="hidden" name="book_id" value="{{ book['book_id'] }}">
+                                    <button type="submit" class="btn btn-warning">Reserve</button>
+                                </form>
+                                {% elif available_copies == 0 and book['has_reserved'] %}
+                                    <span class="reserved-label">Reserved</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data">
+                    {% if search_query %}
+                        No books found matching your search criteria. Try different keywords or filters.
+                    {% else %}
+                        📚 You haven't borrowed any books yet. <a href="#search">Search for books</a> to get started!
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div id="showMoreContainer"></div>
+        </div>
+
+        <div class="section">
+            <h2>📖 Your Current Books</h2>
+            {% if issued_records %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for issued in issued_records %}
+                        <tr class="{% if issued['return_date'] == None and issued['days_overdue'] > 0 %}overdue-row{% endif %}">
+                            <td><strong>{{ issued['title'] | e }}</strong></td>
+                            <td>{{ issued['author_name'] | e }}</td>
+                            <td>{{ issued['issue_date'] }}</td>
+                            <td>{{ issued['due_date'] }}</td>
+                            <td>
+                                {% if issued['return_date'] %}
+                                    <span class="status-returned">Returned</span>
+                                    <br><small>on {{ issued['return_date'] }}</small>
+                                {% elif issued['return_date'] == None and issued['days_overdue'] > 0 %}
+                                    <span class="status-issued">Overdue</span>
+                                    <br><small>{{ issued['days_overdue'] }} days late</small>
+                                {% else %}
+                                    <span class="status-issued">Issued</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if issued['fine_amount'] %}
+                                    <span style="color: #e74c3c; font-weight: bold;">
+                                        ₹{{ '%.2f' | format(issued['fine_amount']) }}
+                                    </span>
+                                    <br><small>({{ issued['fine_status'] }})</small>
+                                {% else %}
+                                    <span style="color: #27ae60;">No Fine</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    📚 You haven't borrowed any books yet. <a href="#search">Search for books</a> to get started!
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>❤️ Your Wishlist</h2>
+            {% if wishlist_records %}
+                <div class="books-grid">
+                    {% for wishlist_book in wishlist_records %}
+                        {% set available_copies = wishlist_book['total_stock'] - wishlist_book['issued_count'] %}
+                        {% set availability_class = 'available' if available_copies > 2 else ('limited' if available_copies > 0 else 'unavailable') %}
+                        {% set availability_text = 'Available (' ~ available_copies ~ ' copies)' if available_copies > 0 else 'Not Available' %}
+                        <div class="book-card">
+                            <div class="book-title">{{ wishlist_book['title'] | e }}</div>
+                            <div class="book-author">by {{ wishlist_book['author_name'] | e }}</div>
+                            <div class="book-category">{{ wishlist_book['category'] | e }}</div>
+                            <div class="book-details">
+                                Added to wishlist: {{ wishlist_book['added_date'] }}
+                            </div>
+                            <div class="book-availability">
+                                <span class="{{ availability_class }}">{{ availability_text }}</span>
+                            </div>
+                            <div class="book-actions">
+                                <form method="POST" action="{{ url_for('user_dashboard') }}" style="display: inline;">
+                                    <input type="hidden" name="book_id" value="{{ wishlist_book['book_id'] }}">
+                                    <button type="submit" name="toggle_wishlist" class="btn btn-danger">
+                                        💔 Remove from Wishlist
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data">
+                    💔 Your wishlist is empty. <a href="#search">Search for books</a> and add them to your wishlist!
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>🌟 Recommended for You</h2>
+            {% if recommended_books %}
+                <div class="books-grid">
+                    {% for book in recommended_books %}
+                        <div class="book-card">
+                            <div class="book-title">{{ book['title'] | e }}</div>
+                            <div class="book-author">by {{ book['author_name'] | e }}</div>
+                            <div class="book-category">{{ book['category'] | e }}</div>
+                            <div class="book-details">
+                                {% if book['year'] %}
+                                    Published: {{ book['year'] | e }}<br>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No recommendations yet. Borrow books to get personalized suggestions!</p>
+            {% endif %}
+        </div>
+
+        <div style="margin: 1em 0;">
+            <a href="{{ url_for('my_reservations') }}" class="btn btn-info">View My Reservations</a>
+        </div>
+    </div>
+    
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <span class="header-text">Library Bot</span>
+            <button class="close-btn" onclick="toggleChatbot()">✖</button>
+        </div>
+        <div class="chatbot-body" id="chatbot-body">
+            <div class="message bot-message">Hello! Ask me about hours, fines, renewals, or book borrowing.</div>
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <button class="open-chatbot-btn" onclick="toggleChatbot()">
+        🤖 Chat with us!
+    </button>
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+</body>
+</html>

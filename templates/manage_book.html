@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Book</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <script src="{{ url_for('static', filename='show_more_admin_books.js') }}" defer></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>Library Admin</h2>
+        <nav>
+            <a href="{{ url_for('admin_page') }}">Dashboard</a>
+            <a href="{{ url_for('manage_member') }}">Manage Member</a>
+            <a href="{{ url_for('manage_book') }}">Manage Books</a>
+            <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+            <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+            <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+            <a href="{{ url_for('manage_return') }}">Returns</a>
+            <a href="{{ url_for('report_page') }}">Reports</a>
+        </nav>
+        <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+    </aside>
+
+    <main class="main-content">
+        <h1>Manage Book</h1>
+
+        <h2>{% if edit_data %}Edit Available Book{% else %}Add New Book{% endif %}</h2>
+        <form method="POST" action="{{ url_for('manage_book') }}" style="margin-bottom: 30px;">
+            <input type="hidden" name="book_id" value="{{ edit_data['book_id'] if edit_data else '' }}">
+            <input type="text" name="title" placeholder="Book Title" required value="{{ edit_data['title'] if edit_data else '' }}">
+            <input type="text" name="category" placeholder="Category" required value="{{ edit_data['category'] if edit_data else '' }}">
+            <input type="text" name="author_name" placeholder="Author Name" required value="{{ edit_data['author_name'] if edit_data else '' }}">
+            <input type="text" name="publisher" placeholder="Publisher" required value="{{ edit_data['publisher'] if edit_data else '' }}">
+            <input type="text" name="year" placeholder="Published Year" required value="{{ edit_data['year'] if edit_data else '' }}">
+            <input type="text" name="edition" placeholder="Edition" required value="{{ edit_data['edition'] if edit_data else '' }}">
+            <input type="text" name="total_stock" placeholder="Total Stock" required value="{{ edit_data['total_stock'] if edit_data else '' }}">
+            
+            <button type="submit" name="{% if edit_data %}edit_book{% else %}add_book{% endif %}">
+                {% if edit_data %}Update Book{% else %}Add Book{% endif %}
+            </button>
+        </form>
+
+        <h2>All Books</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book Id</th><th>Book Title</th><th>Category</th><th>Author Name</th><th>Publisher</th><th>Published Year</th><th>Edition</th><th>Stock Available</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in books %}
+                    <tr>
+                        <td>{{ row['book_id'] }}</td>
+                        <td>{{ row['title'] | e }}</td>
+                        <td>{{ row['category'] | e }}</td>
+                        <td>{{ row['author_name'] | e }}</td>
+                        <td>{{ row['publisher'] | e }}</td>
+                        <td>{{ row['year'] | e }}</td>
+                        <td>{{ row['edition'] | e }}</td>
+                        <td>{{ row['total_stock'] | e }}</td>
+                        <td>
+                            <a href="{{ url_for('manage_book', edit=row['book_id']) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="{{ url_for('manage_book', delete=row['book_id']) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

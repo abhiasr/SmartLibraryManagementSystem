@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Members</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+<aside class="sidebar">
+    <h2>Library Admin</h2>
+    <nav>
+        <a href="{{ url_for('admin_page') }}">Dashboard</a>
+        <a href="{{ url_for('manage_member') }}">Manage Member</a>
+        <a href="{{ url_for('manage_book') }}">Manage Books</a>
+        <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+        <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+        <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+        <a href="{{ url_for('manage_return') }}">Returns</a>
+        <a href="{{ url_for('report_page') }}">Reports</a>
+    </nav>
+    <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+</aside>
+
+<main class="main-content">
+    <h1>Manage Members</h1>
+
+    <h2>{% if edit_data %}Edit Member{% else %}Add New Member{% endif %}</h2>
+    <form method="POST" style="margin-bottom: 30px;">
+        <input type="hidden" name="member_id" value="{{ edit_data['member_id'] if edit_data else '' }}">
+        <input type="text" name="first_name" placeholder="First Name" required value="{{ edit_data['first_name'] if edit_data else '' }}">
+        <input type="text" name="last_name" placeholder="Last Name" required value="{{ edit_data['last_name'] if edit_data else '' }}">
+        <input type="text" name="address" placeholder="Address" required value="{{ edit_data['address'] if edit_data else '' }}">
+        <input type="text" name="mob_no" placeholder="Mobile No" required value="{{ edit_data['mob_no'] if edit_data else '' }}">
+        <input type="email" name="email_id" placeholder="Email" required value="{{ edit_data['email_id'] if edit_data else '' }}">
+        {% if not edit_data %}
+            <input type="password" name="password" placeholder="Password" required>
+        {% endif %}
+        <select name="role" required>
+            <option value="admin" {% if edit_data and edit_data['role'] == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="user" {% if edit_data and edit_data['role'] == 'user' %}selected{% endif %}>User</option>
+        </select>
+        <button type="submit" name="{% if edit_data %}edit_member{% else %}add_member{% endif %}">
+            {% if edit_data %}Update Member{% else %}Add Member{% endif %}
+        </button>
+    </form>
+
+    <h2>All Members</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>First</th><th>Last</th><th>Address</th><th>Mobile</th><th>Email</th><th>Role</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in members %}
+                <tr>
+                    <td>{{ row['member_id'] | e }}</td>
+                    <td>{{ row['first_name'] | e }}</td>
+                    <td>{{ row['last_name'] | e }}</td>
+                    <td>{{ row['address'] | e }}</td>
+                    <td>{{ row['mob_no'] | e }}</td>
+                    <td>{{ row['email_id'] | e }}</td>
+                    <td>{{ row['role'] | e }}</td>
+                    <td>
+                        <a href="{{ url_for('manage_member', edit=row['member_id']) }}">Edit</a> |
+                        <a href="{{ url_for('manage_member', delete=row['member_id']) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

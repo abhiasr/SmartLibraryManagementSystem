@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Members</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+<aside class="sidebar">
+    <h2>Library Admin</h2>
+    <nav>
+        <a href="{{ url_for('admin_page') }}">Dashboard</a>
+        <a href="{{ url_for('manage_member') }}">Manage Member</a>
+        <a href="{{ url_for('manage_book') }}">Manage Books</a>
+        <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+        <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+        <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+        <a href="{{ url_for('manage_return') }}">Returns</a>
+        <a href="{{ url_for('report_page') }}">Reports</a>
+    </nav>
+    <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+</aside>
+
+<div class="main-content">
+    {% if message %}
+        <div class="success-message">
+            {{ message }}
+        </div>
+    {% endif %}
+    <h2>Wishlist Details</h2>
+    <div class="table-container">
+    <table>
+    <thead>
+      <tr>
+        <th>Wishlist ID</th><th>Member Id</th><th>Book Id</th><th>Book Name</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if wishlist_records %}
+        {% for row in wishlist_records %}
+            <tr>
+                <td>{{ row['wishlist_id'] }}</td>
+                <td>{{ row['member_id'] | e }}</td>
+                <td>{{ row['book_id'] | e }}</td>
+                <td>{{ row['book_title'] }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('wishlist_data') }}" style="display:inline;">
+                      <input type="hidden" name="member_id" value="{{ row['member_id'] }}">
+                      <input type="hidden" name="book_id" value="{{ row['book_id'] }}">
+                      <button type="submit" name="issue_book" class="issue-btn">Issue</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="5">No wishlist records found.</td></tr>
+    {% endif %}
+    </tbody>
+    </table>
+    </div>
+</div>
+</body>
+</html>

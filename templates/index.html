@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .form-box, .container {
+            position: relative;
+            z-index: 1; /* Lower than .bg-text */
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-text">Library</div>
+    <h1>Library Chatbot Responses</h1>
+    <ul>
+        {% for response in chatbot_responses %}
+            <li><strong>{{ response['keyword'] }}:</strong> {{ response['response'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

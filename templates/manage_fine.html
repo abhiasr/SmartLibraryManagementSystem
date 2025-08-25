@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Fine Details - Library Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fine.css') }}">
+</head>
+<body>
+<aside class="sidebar">
+    <h2>Library Admin</h2>
+    <nav>
+        <a href="{{ url_for('admin_page') }}">Dashboard</a>
+        <a href="{{ url_for('manage_member') }}">Manage Member</a>
+        <a href="{{ url_for('manage_book') }}">Manage Books</a>
+        <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+        <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+        <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+        <a href="{{ url_for('manage_return') }}">Returns</a>
+        <a href="{{ url_for('report_page') }}">Reports</a>
+    </nav>
+    <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+</aside>
+
+<main class="main-content">
+    <h1>Fine Details</h1>
+    <p>Manage and track library fines</p>
+
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ total_fines }}</h3>
+            <p>Total Fines</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ pending_fines }}</h3>
+            <p>Pending Fines</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ paid_fines }}</h3>
+            <p>Paid Fines</p>
+        </div>
+        <div class="stat-card">
+            <h3>₹{{ '%.2f' | format(total_amount) }}</h3>
+            <p>Outstanding Amount</p>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <form method="GET" class="filter-row">
+            <label for="status">Filter by Status:</label>
+            <select name="status" id="status">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Paid" {% if status_filter == 'Paid' %}selected{% endif %}>Paid</option>
+            </select>
+            
+            <label for="member">Search Member:</label>
+            <input type="text" name="member" id="member" placeholder="Enter member name" value="{{ member_filter | e }}">
+            
+            <button type="submit">Filter</button>
+            <a href="{{ url_for('manage_fine') }}" style="margin-left: 10px; text-decoration: none; background: #95a5a6; color: white; padding: 8px 15px; border-radius: 4px;">Clear</a>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fine ID</th>
+                    <th>Member</th>
+                    <th>Book Title</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Days Late</th>
+                    <th>Fine Amount</th>
+                    <th>Status</th>
+                    <th>Fine Date</th>
+                    <th>Payment Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if fines %}
+                    {% for row in fines %}
+                    <tr>
+                        <td>{{ row['fine_id'] | e }}</td>
+                        <td>
+                            <strong>{{ (row['first_name'] + ' ' + row['last_name']) | e }}</strong><br>
+                            <small>{{ row['email_id'] | e }}</small><br>
+                            <small>{{ row['mob_no'] | e }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ row['title'] | e }}</strong><br>
+                            <small>by {{ row['author_name'] | e }}</small>
+                        </td>
+                        <td>{{ row['issue_date'] }}</td>
+                        <td>{{ row['due_date'] }}</td>
+                        <td>{{ row['return_date'] or '—' }}</td>
+                        <td>{{ row['days_late'] }} days</td>
+                        <td class="fine-amount">₹{{ '%.2f' | format(row['fine_amount']) }}</td>
+                        <td>
+                            <span class="status-{{ row['status'] | lower }}">{{ row['status'] | e }}</span>
+                        </td>
+                        <td>{{ row['fine_date'] }}</td>
+                        <td>{{ row['payment_date'] or '—' }}</td>
+                        <td>
+                            {% if row['status'] == 'Pending' %}
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="fine_id" value="{{ row['fine_id'] }}">
+                                <button type="submit" name="pay_fine" class="pay-btn" onclick="return confirm('Mark this fine as paid?')">
+                                    Mark Paid
+                                </button>
+                            </form>
+                            {% endif %}
+                            <a href="{{ url_for('manage_fine', delete=row['fine_id']) }}"
+                                class="delete-btn"
+                                onclick="return confirm('Are you sure you want to delete this fine record?')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="12" style="text-align: center; padding: 30px; color: #7f8c8d;">
+                        No fine records found matching the selected criteria.
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

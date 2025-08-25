@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+    .profile-pic {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #4a72f5;
+        margin-bottom: 18px;
+    }
+    .profile-form {
+        max-width: 400px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(74,114,245,0.10);
+        padding: 32px 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-form input[type="text"], .profile-form input[type="email"] {
+        width: 100%;
+        margin-bottom: 16px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .profile-form input[type="file"] {
+        margin-bottom: 16px;
+    }
+    .profile-form button {
+        background: #4a72f5;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 28px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s;
+    }
+    .profile-form button:hover {
+        background: #235390;
+    }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <h2>My Profile</h2>
+        {% if error %}<div style="color:#e74c3c; text-align:center;">{{ error }}</div>{% endif %}
+        {% if success %}<div style="color:#27ae60; text-align:center;">{{ success }}</div>{% endif %}
+        <form class="profile-form" method="POST" enctype="multipart/form-data">
+            <img class="profile-pic" src="{{ url_for('static', filename='profile_pics/' + (user['profile_pic'] if user['profile_pic'] else 'default.png')) }}" alt="Profile Picture">
+            <input type="file" name="profile_pic" accept="image/*">
+            <input type="text" name="first_name" placeholder="First Name" value="{{ user['first_name'] }}" required>
+            <input type="text" name="last_name" placeholder="Last Name" value="{{ user['last_name'] }}" required>
+            <input type="text" name="address" placeholder="Address" value="{{ user['address'] }}" required>
+            <input type="text" name="mob_no" placeholder="Phone Number" value="{{ user['mob_no'] }}" required>
+            <input type="email" name="email_id" placeholder="Email" value="{{ user['email_id'] }}" required>
+            <input type="password" name="new_password" placeholder="New Password (leave blank to keep current)">
+            <button type="submit">Update Profile</button>
+        </form>
+        <div style="text-align:center; margin-top:20px;">
+            <a href="{{ url_for('user_dashboard') if user['role']=='user' else url_for('admin_page') }}">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

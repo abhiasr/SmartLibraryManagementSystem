@@ -1,0 +1,278 @@
+/* Stylish Show More button for user books grid */
+#showMoreBtn {
+    display: block;
+    margin: 36px auto 0 auto;
+    padding: 16px 44px;
+    background: linear-gradient(90deg, #4a72f5 0%, #235390 100%);
+    color: #fff;
+    border: none;
+    border-radius: 32px;
+    font-size: 1.25em;
+    font-weight: 700;
+    box-shadow: 0 4px 18px rgba(74,114,245,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+    letter-spacing: 1.5px;
+    text-shadow: 0 1px 4px rgba(74,114,245,0.10);
+}
+#showMoreBtn:hover, #showMoreBtn:focus {
+    background: linear-gradient(90deg, #235390 0%, #4a72f5 100%);
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 8px 32px rgba(74,114,245,0.22), 0 2px 8px rgba(0,0,0,0.10);
+    outline: none;
+}
+/* User Dashboard: Available Books Grid Styling */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    margin: 32px 0 0 0;
+    padding: 0 10px;
+}
+
+.book-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(74,114,245,0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+    padding: 24px 18px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    min-height: 220px;
+}
+.book-card:hover {
+    box-shadow: 0 6px 32px rgba(74,114,245,0.18), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-4px) scale(1.03);
+}
+.book-title {
+    font-size: 1.18em;
+    font-weight: 700;
+    color: #235390;
+    margin-bottom: 6px;
+}
+.book-author {
+    font-size: 1em;
+    color: #4a72f5;
+    margin-bottom: 4px;
+}
+.book-category {
+    font-size: 0.98em;
+    color: #888;
+    margin-bottom: 8px;
+}
+.book-details {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 8px;
+}
+.book-availability {
+    margin-bottom: 10px;
+}
+.available {
+    color: #27ae60;
+    font-weight: 600;
+}
+.limited {
+    color: #e67e22;
+    font-weight: 600;
+}
+.unavailable {
+    color: #e74c3c;
+    font-weight: 600;
+}
+.book-actions {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.wishlist-btn, .btn-warning, .btn-primary, .btn-danger {
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 0.98em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    box-shadow: 0 1px 4px rgba(74,114,245,0.08);
+}
+.btn-primary {
+    background: #4a72f5;
+    color: #fff;
+}
+.btn-primary:hover {
+    background: #235390;
+}
+.btn-danger {
+    background: #e74c3c;
+    color: #fff;
+}
+.btn-danger:hover {
+    background: #c0392b;
+}
+.btn-warning {
+    background: #f1c40f;
+    color: #fff;
+}
+.btn-warning:hover {
+    background: #b7950b;
+}
+.reserved-label {
+    background: #e67e22;
+    color: #fff;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.95em;
+    font-weight: 600;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    position: relative; /* Add this line */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #ffefef, #4a72f5);
+    color: #333;
+}
+
+.container {
+    margin: 0 40px;
+}
+
+.form-box {
+    height: auto;
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.form-box.active {
+    display: block;
+}
+
+h2 {
+    font-size: 34px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: #eee;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    background: #eee;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #7494ec;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: aliceblue;
+    font-weight: 500;
+    margin-bottom: 20px;
+    transition: 0.5s;
+}
+
+.bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+button:hover {
+    background: #6884d3;
+}
+
+p {
+    font-size: 14.5px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+p a {
+    color: #7494ec;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+.comu {
+    font-size: 18px;
+    font-weight: bold;
+    color: #7494ec;
+}
+
+.icon {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.error-message {
+    padding: 12px;
+    background: #f8d7da;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #a42834;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10vw; /* Reduced from 16vw to fit */
+    color: rgba(255,255,255,0.7);
+    font-weight: bold;
+    z-index: 10;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    width: 90vw; /* Ensures it doesn't overflow */
+    text-align: center;
+}
+
+.form-box, .container {
+    position: relative;
+    z-index: 1; /* Ensure login box is above bg-text */
+}

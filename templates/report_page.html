@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reports - Library Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin2.css') }}" />
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>Library Admin</h2>
+        <nav>
+            <a href="{{ url_for('admin_page') }}">Dashboard</a>
+            <a href="{{ url_for('manage_member') }}">Manage Member</a>
+            <a href="{{ url_for('manage_book') }}">Manage Books</a>
+            <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+            <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+            <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+            <a href="{{ url_for('manage_return') }}">Returns</a>
+            <a href="{{ url_for('report_page') }}">Reports</a>
+        </nav>
+        <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+    </aside>
+
+    <main class="main-content">
+        <h1>Reports</h1>
+
+        <section class="report-section">
+            <form method="get" class="timeframe-form">
+                <label for="tf">Timeframe: </label>
+                <select name="tf" id="tf" onchange="this.form.submit()">
+                    <option value="daily" {% if timeframe == 'daily' %}selected{% endif %}>Daily</option>
+                    <option value="weekly" {% if timeframe == 'weekly' %}selected{% endif %}>Weekly</option>
+                    <option value="monthly" {% if timeframe == 'monthly' %}selected{% endif %}>Monthly</option>
+                </select>
+            </form>
+
+            <div class="summary-cards">
+                <div class="card"><h2>{{ borrow_summary }}</h2><p>Total Borrows ({{ timeframe | capitalize }})</p></div>
+                <div class="card"><h2>{{ '%.2f' | format(fine_summary) }}</h2><p>Fines Collected (₹)</p></div>
+            </div>
+
+            <label for="reportSelector" style="margin-top:20px; display:inline-block;">Select Report:</label>
+            <select id="reportSelector" onchange="showReport()" style="padding:6px 10px; margin-left:10px;">
+                <option value="topBooks">Top Borrowed Books</option>
+                <option value="activeMembers">Active Members</option>
+                <option value="overdue">Overdue Books</option>
+                <option value="lowStock">Low Stock Books</option>
+                <option value="monthlyTrend">Monthly Borrowing Trend</option>
+                <option value="categoryPopularity">Category Popularity</option>
+                <option value="fineSummary">Fine Collection Summary</option>
+                <option value="topAuthors">Top Authors</option>
+                <option value="allIssued">All Issued Books</option>
+            </select>
+        </section>
+
+        <section class="report-section rp" id="topBooks">
+            <h2>Top Borrowed Books</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Rank</th><th>Title</th><th>Author</th><th>Times Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if top_books %}
+                        {% for row in top_books %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ row['title'] | e }}</td>
+                            <td>{{ row['author_name'] | e }}</td>
+                            <td>{{ row['borrow_count'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="4">No data found.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="activeMembers" style="display:none;">
+            <h2>Members With Most Borrows</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Rank</th><th>Member Name</th><th>Times Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if active_members %}
+                        {% for row in active_members %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ row['member_name'] | e }}</td>
+                            <td>{{ row['borrow_count'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="3">No data found.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="overdue" style="display:none;">
+            <h2>Currently Overdue Books</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Issue ID</th><th>Book Title</th><th>Borrower</th><th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if overdue %}
+                        {% for row in overdue %}
+                        <tr>
+                            <td>{{ row['issue_id'] }}</td>
+                            <td>{{ row['title'] | e }}</td>
+                            <td>{{ row['member_name'] | e }}</td>
+                            <td>{{ row['due_date'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="4">No overdue books at the moment.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="lowStock" style="display:none;">
+            <h2>Low Stock Books (Less than 3)</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Book ID</th><th>Title</th><th>Stock Left</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if low_stock %}
+                        {% for row in low_stock %}
+                        <tr>
+                            <td>{{ row['book_id'] }}</td>
+                            <td>{{ row['title'] | e }}</td>
+                            <td>{{ row['total_stock'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="3">All books have sufficient stock.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="monthlyTrend" style="display:none;">
+            <h2>Monthly Borrowing Trend (Last 12 Months)</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Month</th><th>Total Borrows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if monthly_borrow %}
+                        {% for row in monthly_borrow %}
+                        <tr>
+                            <td>{{ row['month'] }}</td>
+                            <td>{{ row['borrow_count'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="2">No borrowing data available.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="categoryPopularity" style="display:none;">
+            <h2>Category Popularity</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Category</th><th>Total Borrows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if category_popularity %}
+                        {% for row in category_popularity %}
+                        <tr>
+                            <td>{{ row['category'] | e or 'Uncategorized' }}</td>
+                            <td>{{ row['borrow_count'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="2">No data available.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="fineSummary" style="display:none;">
+            <h2>Fine Collection Summary (Last 12 Months)</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Month</th><th>Total Collected (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if fine_collection %}
+                        {% for row in fine_collection %}
+                        <tr>
+                            <td>{{ row['month'] }}</td>
+                            <td>{{ '%.2f' | format(row['total_collected']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="2">No fine collection data.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="topAuthors" style="display:none;">
+            <h2>Top Authors by Borrow Count</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Rank</th><th>Author</th><th>Total Borrows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if top_authors %}
+                        {% for row in top_authors %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ row['author_name'] | e }}</td>
+                            <td>{{ row['borrow_count'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="3">No data available.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <section class="report-section rp" id="allIssued" style="display:none;">
+            <h2>All Issued Books</h2>
+            <div class="table-container">
+            <table border="1" cellpadding="10" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Issue ID</th><th>Book Title</th><th>Member Name</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if all_issued %}
+                        {% for row in all_issued %}
+                        <tr>
+                            <td>{{ row['issue_id'] }}</td>
+                            <td>{{ row['title'] | e }}</td>
+                            <td>{{ row['member_name'] | e }}</td>
+                            <td>{{ row['issue_date'] }}</td>
+                            <td>{{ row['due_date'] }}</td>
+                            <td>{{ row['return_date'] or '—' }}</td>
+                            <td>{{ 'Returned' if row['return_date'] else 'Not Returned' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="7">No issued records found.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+    </main>
+    <script>
+        function showReport(){
+            const v=document.getElementById('reportSelector').value;
+            document.querySelectorAll('.rp').forEach(s=>{
+                s.style.display = (s.id===v)?'block':'none';
+            });
+        }
+        document.addEventListener('DOMContentLoaded',showReport);
+    </script>
+</body>
+</html>

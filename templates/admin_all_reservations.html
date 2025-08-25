@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Book Reservations - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>All Book Reservations</h2>
+        <a href="{{ url_for('admin_page') }}">&larr; Back to Admin Dashboard</a>
+        {% if reservations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Member Name</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Date Reserved</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['author_name'] }}</td>
+                    <td>{{ r['first_name'] }} {{ r['last_name'] }}</td>
+                    <td>{{ r['mob_no'] }}</td>
+                    <td>{{ r['email_id'] }}</td>
+                    <td>{{ r['reserved_date'] }}</td>
+                    <td>{{ r['status'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No active reservations.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>Library Admin</h2>
+        <nav>
+            <a href="{{ url_for('admin_page') }}">Dashboard</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('manage_member') }}">Manage Member</a>
+            <a href="{{ url_for('manage_book') }}">Manage Books</a>
+            <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+            <a href="{{ url_for('admin_all_reservations') }}">
+                Book Reservations
+                {% if pending_count > 0 %}
+                    <span style="background: #e74c3c; color: #fff; border-radius: 50%; padding: 2px 8px; font-size: 0.9em; margin-left: 6px;">{{ pending_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+            <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+            <a href="{{ url_for('manage_return') }}">Returns</a>
+            <a href="{{ url_for('report_page') }}">Reports</a>
+        </nav>
+        <div style="margin: 20px 0 0 0; text-align:center;">
+            <button id="notifBell" style="background:none;border:none;cursor:pointer;font-size:1.6em;position:relative;">
+                🔔<span id="notifCount" style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 6px;font-size:0.8em;display:none;">0</span>
+            </button>
+            <div id="notifDropdown" style="display:none;position:absolute;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:320px;max-height:350px;overflow-y:auto;z-index:1001;">
+                <div id="notifList" style="padding:10px;"></div>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+    </aside>
+    <script>
+    function fetchNotifications() {
+        fetch('/notifications').then(r=>r.json()).then(data=>{
+            let count = data.unread_count;
+            let notifCount = document.getElementById('notifCount');
+            notifCount.textContent = count;
+            notifCount.style.display = count > 0 ? 'inline-block' : 'none';
+            let notifList = document.getElementById('notifList');
+            notifList.innerHTML = '';
+            if(data.notifications.length === 0) {
+                notifList.innerHTML = '<div style="padding:10px;color:#888;">No notifications</div>';
+            } else {
+                data.notifications.forEach(n=>{
+                    notifList.innerHTML += `<div style='padding:8px 0;border-bottom:1px solid #eee;${n.is_read ? '' : 'font-weight:bold;'}'>${n.message}<br><span style='font-size:0.8em;color:#888;'>${n.created_at ? n.created_at.split('T')[0] : ''}</span></div>`;
+                });
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded',()=>{
+        fetchNotifications();
+        document.getElementById('notifBell').onclick = function(e) {
+            let dd = document.getElementById('notifDropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+            fetchNotifications();
+        };
+        document.addEventListener('click', function(e) {
+            if(!e.target.closest('#notifBell') && !e.target.closest('#notifDropdown')) {
+                document.getElementById('notifDropdown').style.display = 'none';
+            }
+        });
+    });
+    </script>
+
+    <main class="main-content">
+        <h1>Welcome, <span id="adminName">{{ session['name'] }}</span></h1>
+        <p>Your dashboard</p>
+
+        <section class="cards">
+            <div class="card">
+                <h2>{{ total_books }}</h2>
+                <p>Books Available</p>
+            </div>
+            <div class="card">
+                <h2>{{ total_users }}</h2>
+                <p>Registered Users</p>
+            </div>
+            <div class="card">
+                <h2>{{ pending_issues }}</h2>
+                <p>Book Currently Issued</p>
+            </div>
+            <div class="card">
+                <h2>{{ due_today }}</h2>
+                <p>Books Due Today</p>
+            </div>
+        </section>
+
+        <section class="recent">
+            <h2>Recent Book Issues</h2>
+            <div class="table-container">
+                <table border="1" cellpadding="10" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Issue ID</th>
+                            <th>Member Name</th>
+                            <th>Book Title</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in recent_issues %}
+                        <tr>
+                            <td>{{ row['issue_id'] }}</td>
+                            <td>{{ row['member_name'] | e }}</td>
+                            <td>{{ row['book_title'] | e }}</td>
+                            <td>{{ row['issue_date'] }}</td>
+                            <td>{{ row['due_date'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- User Activity Log Table -->
+                <h3 style="margin-top:40px;display:inline-block;">Recent User Activity Log</h3>
+                <button id="exportLogBtn" style="float:right;margin-top:40px;margin-bottom:10px;">Export CSV</button>
+                <table id="activityLogTable" border="1" cellpadding="8" cellspacing="0" style="width:100%;margin-top:10px;">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogBody">
+                        {% for log in activity_log %}
+                        <tr class="log-row log-{{ log['action'] }}">
+                            <td>{{ log['created_at'] }}</td>
+                            <td>{{ log['user_link']|safe }}</td>
+                            <td>{{ log['desc']|safe }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <style>
+                .log-row.log-add_wishlist td { color: #2e7d32; }
+                .log-row.log-remove_wishlist td { color: #c62828; }
+                .log-row.log-reserve_book td { color: #1565c0; }
+                .log-row.log-return_book td { color: #6d4c41; }
+                .log-link { text-decoration: underline; color: #1976d2; }
+                .log-link:hover { color: #0d47a1; }
+                </style>
+                <script>
+                // Export CSV
+                document.getElementById('exportLogBtn').onclick = function() {
+                    window.location = '/admin/export_activity_log';
+                };
+                // Live update every 20s
+                function fetchActivityLog() {
+                    fetch('/admin_page?ajax=1').then(r=>r.json()).then(data=>{
+                        let tbody = document.getElementById('activityLogBody');
+                        tbody.innerHTML = '';
+                        data.forEach(function(log) {
+                            tbody.innerHTML += `<tr class="log-row log-${log.action}"><td>${log.created_at}</td><td>${log.user_link}</td><td>${log.desc}</td></tr>`;
+                        });
+                    });
+                }
+                setInterval(fetchActivityLog, 20000);
+                </script>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

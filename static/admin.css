@@ -1,0 +1,242 @@
+/* Stylish Show More button for admin books table */
+#showMoreAdminBtn {
+    display: block;
+    margin: 24px auto 0 auto;
+    padding: 12px 32px;
+    background: linear-gradient(90deg, #4f8cff 0%, #235390 100%);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1em;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(79,140,255,0.12);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 1px;
+}
+#showMoreAdminBtn:hover, #showMoreAdminBtn:focus {
+    background: linear-gradient(90deg, #235390 0%, #4f8cff 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(79,140,255,0.18);
+    outline: none;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f5f7fa;
+    color: #3a3a3a;
+    display: flex;
+    min-height: 100vh;
+}
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    background: #213155f0;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    margin-bottom: 40px;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.sidebar nav a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+}
+
+.sidebar nav a:hover {
+    background: #8ba3f1;
+}
+
+.sidebar .logout-btn {
+    margin-top: auto;
+    padding: 12px;
+    background: #e74c3c;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .logout-btn:hover {
+    background: #c0392b;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    background: linear-gradient(135deg, #ffefef 0%, #4a72f5 100%);
+    color: rgb(33, 33, 33);
+    overflow-y: auto;
+}
+
+.main-content h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.main-content p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    opacity: 0.85;
+}
+
+/* Dashboard cards */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.card:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.card h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.card p {
+    font-size: 16px;
+    opacity: 0.75;
+}
+
+form input, form select, form button {
+    margin: 5px;
+    padding: 8px;
+    font-size: 1em;
+}
+form button {
+    border-radius: 6px;
+    background: #65913d;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+form button:hover {
+    background: #293d0e;
+}
+
+.table-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+
+th {
+    background: #34495e;
+    color: white;
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+.recent {
+    margin-top: 40px;
+}
+
+.recent h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+/* Report sections */
+.report-section {
+    margin-top: 40px;
+}
+
+.report-section h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+.report-section:last-of-type {
+    margin-bottom: 60px;
+}
+.timeframe-form {
+    margin-bottom: 15px;
+}
+.timeframe-form select {
+    padding: 6px 10px;
+    font-size: 14px;
+}
+.summary-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.summary-cards .card {
+    flex: 0 1 200px;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+ 
+.issue-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.issue-btn:hover {
+    background-color: #45a049;
+}

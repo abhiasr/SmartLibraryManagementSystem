@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Issued Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+<aside class="sidebar">
+    <h2>Library Admin</h2>
+    <nav>
+        <a href="{{ url_for('admin_page') }}">Dashboard</a>
+        <a href="{{ url_for('manage_member') }}">Manage Member</a>
+        <a href="{{ url_for('manage_book') }}">Manage Books</a>
+        <a href="{{ url_for('wishlist_data') }}">Book Issue</a>
+        <a href="{{ url_for('manage_fine') }}">Fine Details</a>
+        <a href="{{ url_for('manage_issue') }}">Issued Details</a>
+        <a href="{{ url_for('manage_return') }}">Returns</a>
+        <a href="{{ url_for('report_page') }}">Reports</a>
+    </nav>
+    <button class="logout-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+</aside>
+
+<div class="main-content">
+    <h1>Issue Details</h1>
+    <div class="table-container">
+    <table>
+    <thead>
+      <tr>
+        <th>Issue ID</th><th>Member Name</th><th>Book Title</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if issued_records %}
+        {% for row in issued_records %}
+          <tr>
+            <td>{{ row['issue_id'] }}</td>
+            <td>{{ row['member_name'] | e }}</td>
+            <td>{{ row['book_title'] | e }}</td>
+            <td>{{ row['issue_date'] }}</td>
+            <td>{{ row['due_date'] }}</td>
+            <td>{{ row['return_date'] or '—' }}</td>
+            <td>{{ 'Returned' if row['return_date'] else 'Not Returned' }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="7">No issued records found.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+  </div>
+</div>
+</body>
+</html>

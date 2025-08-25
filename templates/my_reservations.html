@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Reservations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>My Book Reservations</h2>
+        <a href="{{ url_for('user_dashboard') }}">&larr; Back to Dashboard</a>
+        {% if reservations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Date Reserved</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['author_name'] }}</td>
+                    <td>{{ r['reserved_date'] }}</td>
+                    <td>{{ r['status'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>You have no reservations.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
