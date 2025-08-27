@@ -198,6 +198,94 @@ th, td {
      margin: 0;
      font-size: 14px;
      color: #7f8c8d;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 700px) {
+    body {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100vw;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 8px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .sidebar h2 {
+        font-size: 18px;
+        margin-bottom: 0;
+        margin-right: 10px;
+    }
+    .sidebar nav {
+        display: flex;
+        gap: 8px;
+    }
+    .sidebar nav a {
+        font-size: 14px;
+        padding: 8px 10px;
+        margin-bottom: 0;
+    }
+    .sidebar .logout-btn {
+        font-size: 14px;
+        padding: 8px 10px;
+        margin-top: 0;
+    }
+    .main-content {
+        padding: 12px 4px;
+    }
+    .main-content h1 {
+        font-size: 22px;
+    }
+    .main-content p {
+        font-size: 15px;
+        margin-bottom: 18px;
+    }
+    .cards {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .card {
+        padding: 14px 8px;
+        font-size: 15px;
+    }
+    .card h2 {
+        font-size: 18px;
+    }
+    .card p {
+        font-size: 13px;
+    }
+    table {
+        font-size: 13px;
+        overflow-x: auto;
+        display: block;
+        width: 100%;
+    }
+    th, td {
+        padding: 6px;
+    }
+    .stats-cards, .summary-cards {
+        flex-direction: column;
+        gap: 12px;
+        display: flex;
+    }
+    .stat-card {
+        padding: 12px 6px;
+        font-size: 13px;
+    }
+    .stat-card h3 {
+        font-size: 16px;
+    }
+    .stat-card p {
+        font-size: 12px;
+    }
+    .report-section h2, .recent h2 {
+        font-size: 16px;
+    }
+}
  }
  
  .filter-section {
