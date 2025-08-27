@@ -136,10 +136,7 @@
 }
 
 body {
-    position: relative; /* Add this line */
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    position: relative;
     min-height: 100vh;
     background: linear-gradient(to right, #ffefef, #4a72f5);
     color: #333;
@@ -151,7 +148,11 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    width: 100vw;
     margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .form-box {
@@ -286,38 +287,44 @@ p a:hover {
     @media (max-width: 600px) {
         .container {
             min-height: 100vh;
-            padding: 0 8px;
+            width: 100vw;
+            padding: 0 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         .form-box {
-            max-width: 98vw;
-            padding: 18px 8px;
+            max-width: 100vw;
+            width: 100vw;
+            padding: 12px 2vw;
             border-radius: 6px;
             box-shadow: 0 0 6px rgba(0,0,0,0.08);
         }
         h2 {
-            font-size: 24px;
-            margin-bottom: 14px;
+            font-size: 22px;
+            margin-bottom: 12px;
         }
         input, select, button {
-            font-size: 15px;
-            padding: 10px;
-            margin-bottom: 14px;
+            font-size: 14px;
+            padding: 8px;
+            margin-bottom: 12px;
         }
         .bg {
             object-fit: cover;
             height: 100vh;
+            width: 100vw;
         }
         .comu {
-            font-size: 15px;
+            font-size: 14px;
         }
         .icon {
-            font-size: 18px;
+            font-size: 16px;
         }
         .error-message {
-            font-size: 14px;
-            padding: 8px;
+            font-size: 13px;
+            padding: 6px;
         }
         .bg-text {
-            font-size: 7vw;
+            font-size: 6vw;
         }
     }
