@@ -280,4 +280,44 @@ p a:hover {
 .form-box, .container {
     position: relative;
     z-index: 1; /* Ensure login box is above bg-text */
-}
+    }
+
+    /* Responsive styles for mobile devices */
+    @media (max-width: 600px) {
+        .container {
+            min-height: 100vh;
+            padding: 0 8px;
+        }
+        .form-box {
+            max-width: 98vw;
+            padding: 18px 8px;
+            border-radius: 6px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.08);
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+        input, select, button {
+            font-size: 15px;
+            padding: 10px;
+            margin-bottom: 14px;
+        }
+        .bg {
+            object-fit: cover;
+            height: 100vh;
+        }
+        .comu {
+            font-size: 15px;
+        }
+        .icon {
+            font-size: 18px;
+        }
+        .error-message {
+            font-size: 14px;
+            padding: 8px;
+        }
+        .bg-text {
+            font-size: 7vw;
+        }
+    }
